@@ -76,7 +76,21 @@ chrome.storage.onChanged.addListener(ps => {
 const questions = new Map();
 const customs = {};
 
-const insert = (tabId, prefix, message) => message.trim() && questions.set(tabId, prefix + ':\n\n' + message.trim());
+const insert = (tabId, prefix, message) => {
+  message = message.trim();
+  prefix = prefix.trim();
+  if (message && prefix) {
+    let separator = ':';
+    if (prefix.endsWith('?') || prefix.endsWith(':')) {
+      separator = '';
+    }
+
+    questions.set(tabId, prefix + separator + '\n\n' + message);
+  }
+  else if (message) {
+    questions.set(tabId, message);
+  }
+};
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
   if (request.method === 'get-question') {
@@ -108,11 +122,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       if (info.menuItemId === 'CUSTOM') {
         prepend = await new Promise(resolve => {
           customs[tab.id] = resolve;
-          chrome.offscreen.createDocument({
+          chrome.offscreen.closeDocument().catch(() => {}).then(() => chrome.offscreen.createDocument({
             url: chrome.runtime.getURL('data/prompt/index.html?tabId=' + tab.id),
             reasons: ['IFRAME_SCRIPTING'],
             justification: 'user prompt'
-          });
+          }));
         });
       }
 
