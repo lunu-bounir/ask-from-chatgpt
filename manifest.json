@@ -1,7 +1,7 @@
 {
   "name": "Ask from ChatGPT™",
   "description": "Select a text and send it to ChatGPT to translate or explain more!",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "manifest_version": 3,
   "permissions": [
     "storage",
@@ -28,7 +28,7 @@
     "_execute_action": {}
   },
   "content_scripts": [{
-    "matches": ["https://chat.openai.com/chat"],
+    "matches": ["*://chat.openai.com/*"],
     "js": ["data/inject.js"]
   }],
   "options_ui": {
