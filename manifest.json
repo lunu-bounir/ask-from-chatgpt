@@ -1,7 +1,7 @@
 {
   "name": "Ask from ChatGPT™",
   "description": "Select a text and send it to ChatGPT to translate or explain more!",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "manifest_version": 3,
   "permissions": [
     "storage",
@@ -16,13 +16,13 @@
     "default_title": "Open ChatGPT next to the current tab"
   },
   "icons": {
-    "16": "data/icons/16.png",
-    "32": "data/icons/32.png",
-    "48": "data/icons/48.png",
-    "64": "data/icons/64.png",
-    "128": "data/icons/128.png",
-    "256": "data/icons/256.png",
-    "512": "data/icons/512.png"
+    "16": "/data/icons/16.png",
+    "32": "/data/icons/32.png",
+    "48": "/data/icons/48.png",
+    "64": "/data/icons/64.png",
+    "128": "/data/icons/128.png",
+    "256": "/data/icons/256.png",
+    "512": "/data/icons/512.png"
   },
   "commands": {
     "_execute_action": {}
@@ -30,15 +30,15 @@
   "content_scripts": [{
     "run_at": "document_start",
     "world": "MAIN",
-    "matches": ["*://chat.openai.com/*"],
-    "js": ["data/inject/main.js"]
+    "matches": ["*://chatgpt.com/*"],
+    "js": ["/data/inject/main.js"]
   }, {
     "run_at": "document_start",
     "world": "ISOLATED",
-    "matches": ["*://chat.openai.com/*"],
-    "js": ["data/inject/isolated.js"]
+    "matches": ["*://chatgpt.com/*"],
+    "js": ["/data/inject/isolated.js"]
   }],
   "options_ui": {
-    "page": "data/options/index.html"
+    "page": "/data/options/index.html"
   }
 }

@@ -9,12 +9,16 @@ port.addEventListener('ask', () => chrome.runtime.sendMessage({
   }
   for (let n = 0; n < 60; n += 1) {
     // console.log('n', n);
-    const textarea = document.querySelector('[data-id="root"]');
-    const button = document.querySelector('[data-id="root"] + button');
+    const textarea = document.getElementById('prompt-textarea') ||
+      document.querySelector('[data-id="root"]');
+    const button = textarea?.nextElementSibling ||
+      document.querySelector('[data-id="root"] + button');
+
+    console.log(textarea, button);
 
     if (textarea && button) {
       for (let m = 0; m < 5; m += 1) {
-        // console.log('m', m);
+        console.log('m', m);
         textarea.click();
         textarea.focus();
         textarea.value = '';
