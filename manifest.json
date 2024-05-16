@@ -1,7 +1,7 @@
 {
   "name": "Ask from ChatGPT™",
   "description": "Select a text and send it to ChatGPT to translate or explain more!",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "manifest_version": 3,
   "permissions": [
     "storage",
