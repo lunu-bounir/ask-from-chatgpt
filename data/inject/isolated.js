@@ -11,14 +11,28 @@ port.addEventListener('ask', () => chrome.runtime.sendMessage({
     // console.log('n', n);
     const textarea = document.getElementById('prompt-textarea') ||
       document.querySelector('[data-id="root"]');
-    const button = textarea?.nextElementSibling ||
-      document.querySelector('[data-id="root"] + button');
-
-    console.log(textarea, button);
+    let button;
+    {
+      const c = textarea?.parentElement?.nextElementSibling;
+      if (c && c.tagName === 'BUTTON') {
+        button = c;
+      }
+    }
+    if (!button) {
+      const c = textarea?.nextElementSibling;
+      if (c && c.tagName === 'BUTTON') {
+        button = c;
+      }
+    }
+    if (!button) {
+      const c = document.querySelector('form button[disabled]');
+      if (c && c.tagName === 'BUTTON') {
+        button = c;
+      }
+    }
 
     if (textarea && button) {
       for (let m = 0; m < 5; m += 1) {
-        console.log('m', m);
         textarea.click();
         textarea.focus();
         textarea.value = '';

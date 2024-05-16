@@ -86,16 +86,37 @@ const insert = (tabId, prefix, message) => {
     }
 
     questions.set(tabId, prefix + separator + '\n\n' + message);
+    // backup plan
+    chrome.storage.session.set({
+      [tabId]: prefix + separator + '\n\n' + message
+    });
   }
   else if (message) {
     questions.set(tabId, message);
+    chrome.storage.session.set({
+      [tabId]: message
+    });
   }
 };
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
   if (request.method === 'get-question') {
-    response(questions.get(sender.tab.id));
-    // questions.delete(sender.tab.id);
+    const sid = sender.tab.id.toString();
+
+    const q = questions.get(sender.tab.id);
+    if (q) {
+      response(q);
+      chrome.storage.session.remove(sid);
+      questions.delete(sender.tab.id);
+    }
+    else {
+      chrome.storage.session.get(sid, prefs => {
+        const q = prefs[sender.tab.id];
+        chrome.storage.session.remove(sid);
+        response(q);
+      });
+      return true;
+    }
   }
   else if (request.method === 'custom-question') {
     customs[request.tabId](request.question);
