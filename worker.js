@@ -1,3 +1,5 @@
+self.importScripts('activate.js');
+
 // dynamic menu
 const menu = () => chrome.storage.local.get({
   mode: 'window',
@@ -9,7 +11,8 @@ const menu = () => chrome.storage.local.get({
     'What do you know about the following'
   ],
   empty: true,
-  custom: true
+  custom: true,
+  engine: 'chatgpt'
 }, prefs => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
@@ -32,6 +35,27 @@ const menu = () => chrome.storage.local.get({
       parentId: 'mode',
       type: 'radio',
       checked: prefs.mode === 'tab'
+    });
+    chrome.contextMenus.create({
+      title: 'Engines',
+      id: 'engines',
+      contexts: ['action']
+    });
+    chrome.contextMenus.create({
+      title: 'ChatGPT',
+      id: 'engine:chatgpt',
+      contexts: ['action'],
+      parentId: 'engines',
+      type: 'radio',
+      checked: prefs.engine === 'chatgpt'
+    });
+    chrome.contextMenus.create({
+      title: 'Gemini',
+      id: 'engine:gemini',
+      contexts: ['action'],
+      parentId: 'engines',
+      type: 'radio',
+      checked: prefs.engine === 'gemini'
     });
 
     for (const question of prefs.questions) {
@@ -72,6 +96,34 @@ chrome.storage.onChanged.addListener(ps => {
     menu();
   }
 });
+
+const change = engine => {
+  const next = () => {
+    chrome.storage.local.set({
+      engine
+    });
+    chrome.contextMenus.update('engine:' + engine, {
+      checked: true
+    });
+  };
+
+  if (engine === 'gemini') {
+    chrome.permissions.request({
+      origins: ['*://gemini.google.com/*']
+    }, granted => {
+      if (granted) {
+        next();
+      }
+      else {
+        engine = 'chatgpt';
+        next();
+      }
+    });
+  }
+  else {
+    next();
+  }
+};
 
 const questions = new Map();
 const customs = {};
@@ -129,11 +181,17 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       mode: info.menuItemId.replace('mode:', '')
     });
   }
+  else if (info.menuItemId.startsWith('engine:')) {
+    let engine = info.menuItemId.replace('engine:', '');
+
+    change(engine);
+  }
   else {
     chrome.storage.local.get({
       mode: 'window',
       width: 900,
-      height: 700
+      height: 700,
+      engine: 'chatgpt'
     }, async prefs => {
       let prepend = info.menuItemId;
 
@@ -144,21 +202,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         prepend = await new Promise(resolve => {
           customs[tab.id] = resolve;
           chrome.offscreen.closeDocument().catch(() => {}).then(() => chrome.offscreen.createDocument({
-            url: chrome.runtime.getURL('data/prompt/index.html?tabId=' + tab.id),
+            url: chrome.runtime.getURL('/data/prompt/index.html?tabId=' + tab.id),
             reasons: ['IFRAME_SCRIPTING'],
             justification: 'user prompt'
           }));
         });
       }
 
+      const url = prefs.engine === 'chatgpt' ? 'https://chatgpt.com/' : 'https://gemini.google.com/app';
+
       if (prefs.mode === 'window') {
         const win = await chrome.windows.getCurrent();
         const left = win.left + Math.round((win.width - prefs.width) / 2);
         const top = win.top + Math.round((win.height - prefs.height) / 2);
 
-
         chrome.windows.create({
-          url: 'https://chat.openai.com/chat',
+          url,
           width: prefs.width,
           height: prefs.height,
           left,
@@ -168,7 +227,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       }
       else {
         chrome.tabs.create({
-          url: 'https://chat.openai.com/chat',
+          url,
           index: tab.index + 1
         }, tab => insert(tab.id, prepend, info.selectionText));
       }
@@ -176,13 +235,21 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-chrome.action.onClicked.addListener(tab => {
-  chrome.tabs.create({
-    url: 'https://chat.openai.com/chat',
-    index: tab.index + 1
-  });
-});
+chrome.action.onClicked.addListener(tab => chrome.storage.local.get({
+  engine: 'chatgpt'
+}, prefs => chrome.tabs.create({
+  url: prefs.engine === 'chatgpt' ? 'https://chatgpt.com/' : 'https://gemini.google.com/app',
+  index: tab.index + 1
+})));
 
+chrome.commands.onCommand.addListener(command => {
+  if (command === 'ask-from-chatgpt') {
+    change('chatgpt');
+  }
+  else if (command === 'ask-from-gemini') {
+    change('gemini');
+  }
+});
 
 /* FAQs & Feedback */
 {

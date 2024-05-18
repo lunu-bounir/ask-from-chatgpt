@@ -1,19 +1,26 @@
 {
-  "name": "Ask from ChatGPT™",
-  "description": "Select a text and send it to ChatGPT to translate or explain more!",
+  "name": "Ask from ChatGPT™ or Gemini™",
+  "description": "Select a text and send it to ChatGPT or Gemini to translate or explain",
   "version": "0.1.6",
   "manifest_version": 3,
   "permissions": [
     "storage",
     "contextMenus",
-    "offscreen"
+    "offscreen",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://chatgpt.com/*"
+  ],
+  "optional_host_permissions": [
+    "*://gemini.google.com/*"
   ],
   "homepage_url": "https://webextension.org/listing/ask-from-chatgpt.html",
   "background": {
     "service_worker": "worker.js"
   },
   "action": {
-    "default_title": "Open ChatGPT next to the current tab"
+    "default_title": "Open ChatGPT or Gemini next to the current tab"
   },
   "icons": {
     "16": "/data/icons/16.png",
@@ -25,19 +32,14 @@
     "512": "/data/icons/512.png"
   },
   "commands": {
-    "_execute_action": {}
+    "_execute_action": {},
+    "ask-from-chatgpt": {
+      "description": "Change engine to ChatGPT"
+    },
+    "ask-from-gemini": {
+      "description": "Change engine to Gemini"
+    }
   },
-  "content_scripts": [{
-    "run_at": "document_start",
-    "world": "MAIN",
-    "matches": ["*://chatgpt.com/*"],
-    "js": ["/data/inject/main.js"]
-  }, {
-    "run_at": "document_start",
-    "world": "ISOLATED",
-    "matches": ["*://chatgpt.com/*"],
-    "js": ["/data/inject/isolated.js"]
-  }],
   "options_ui": {
     "page": "/data/options/index.html"
   }

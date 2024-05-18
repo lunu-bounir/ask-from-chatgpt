@@ -1,7 +1,4 @@
-const port = document.getElementById('ask-from-chatgpt-port');
-port.remove();
-
-port.addEventListener('ask', () => chrome.runtime.sendMessage({
+chrome.runtime.sendMessage({
   method: 'get-question'
 }, async question => {
   if (!question) {
@@ -56,6 +53,4 @@ port.addEventListener('ask', () => chrome.runtime.sendMessage({
 
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-}), {
-  once: true
 });
