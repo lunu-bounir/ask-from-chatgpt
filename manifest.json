@@ -1,7 +1,7 @@
 {
   "name": "Ask from ChatGPT™ or Gemini™",
   "description": "Select a text and send it to ChatGPT or Gemini to translate or explain",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "manifest_version": 3,
   "permissions": [
     "storage",
