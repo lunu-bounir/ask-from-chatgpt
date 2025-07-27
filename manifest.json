@@ -17,7 +17,8 @@
   ],
   "homepage_url": "https://webextension.org/listing/ask-from-chatgpt.html",
   "background": {
-    "service_worker": "worker.js"
+    "service_worker": "worker.js",
+    "scripts": ["activate.js", "worker.js"]
   },
   "action": {
     "default_title": "Open ChatGPT or Gemini next to the current tab"
@@ -42,5 +43,10 @@
   },
   "options_ui": {
     "page": "/data/options/index.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{e51c5708-0880-43ca-a403-7c848a0ea7ea}"
+    }
   }
 }

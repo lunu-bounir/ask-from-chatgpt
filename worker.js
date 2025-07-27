@@ -1,4 +1,6 @@
-self.importScripts('activate.js');
+if (typeof importScripts !== 'undefined') {
+  self.importScripts('activate.js');
+}
 
 // dynamic menu
 const menu = () => chrome.storage.local.get({
