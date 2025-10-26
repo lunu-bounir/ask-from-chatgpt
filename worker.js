@@ -184,8 +184,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
   else if (info.menuItemId.startsWith('engine:')) {
-    let engine = info.menuItemId.replace('engine:', '');
-
+    const engine = info.menuItemId.replace('engine:', '');
     change(engine);
   }
   else {
@@ -193,7 +192,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       mode: 'window',
       width: 900,
       height: 700,
-      engine: 'chatgpt'
+      engine: 'chatgpt',
+      chatgpt: 'https://chatgpt.com/',
+      gemini: 'https://gemini.google.com/app'
     }, async prefs => {
       let prepend = info.menuItemId;
 
@@ -211,7 +212,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         });
       }
 
-      const url = prefs.engine === 'chatgpt' ? 'https://chatgpt.com/' : 'https://gemini.google.com/app';
+      const url = prefs[prefs.engine];
 
       if (prefs.mode === 'window') {
         const win = await chrome.windows.getCurrent();
@@ -238,9 +239,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.action.onClicked.addListener(tab => chrome.storage.local.get({
-  engine: 'chatgpt'
+  engine: 'chatgpt',
+  chatgpt: 'https://chatgpt.com/',
+  gemini: 'https://gemini.google.com/app'
 }, prefs => chrome.tabs.create({
-  url: prefs.engine === 'chatgpt' ? 'https://chatgpt.com/' : 'https://gemini.google.com/app',
+  url: prefs[prefs.engine],
   index: tab.index + 1
 })));
 
